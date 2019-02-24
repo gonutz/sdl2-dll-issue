@@ -1,0 +1,7 @@
+# Issue
+
+I am trying to port [veandco's SDL2 Go wrapper](https://github.com/veandco/go-sdl2) to use the SDL2 DLL on Windows instead of using CGo. In [my port](https://github.com/gonutz/go-sdl2) I have a problem with callbacks right now. This repo recreates a minimal version of the problem I am facing.
+
+The `SDL2-2_0_9-386.dll` DLL found in this repo is the [32 bit DLL download link](https://www.libsdl.org/release/SDL2-2.0.9-win32-x86.zip) from the [official SDL2 homepage](https://www.libsdl.org/download-2.0.php). The problem happens when building a 32 bit Windows application (the code works fine for 64 bit builds using the 64 bit DLL). The `dll_callback.bat` batch file will run the program in 32 bit mode on either Windows version.
+
+The problem is an exception in the code after setting a hint callback and triggering its execution. I use `syscall.NewCallback` to create a callback to pass to the DLL. It fulfills the requirements that are [documented for syscall.NewCallback](https://golang.org/pkg/syscall/?GOOS=windows&GOARCH=386#NewCallback): the function returns a `uintptr` and non of its arguments is larger than a `uintptr`, actually all of them are `uintptr`s. I am stuck on why this works for 64 bit but fails for 32 bit builds. My setup is a 64 bit Windows 8.
